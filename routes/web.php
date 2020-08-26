@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     //return view('welcome');
 
-    // $carver = new FitCarver('usb001.dd');
-    $carver = new FitCarver('garmin001.dd');
+    $carver = new FitCarver('usb001.dd');
+    // $carver = new FitCarver('garmin001.dd');
     $carver->carve();
 });
