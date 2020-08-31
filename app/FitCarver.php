@@ -2,7 +2,9 @@
 
 namespace App;
 
+use App\Investigation;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class FitCarver extends Model
 {
@@ -23,13 +25,30 @@ class FitCarver extends Model
         $data = $this->getHeaderData();
 
         if (!empty($data)) {
-            $i = 0;
 
             foreach ($data as $offset => $fileHeader) {
-                $i++;
-                $file = file_get_contents($this->image, false, null, $offset, $fileHeader['data_size']);
-                // extract to its own method to follow single responsibility
-                file_put_contents('/Users/Steve/Desktop/fit-examples/usb/example-fit-' . $i . '.fit', $file);
+
+                $investigation = Investigation::find(1);
+
+                $file = $investigation->files()->create([
+                    'hash' => null,
+                    'original_offset' => $offset,
+                    'header_data' => json_encode($fileHeader),
+                ]);
+
+                $file->name = $file->id . '.fit';
+                $file->save();
+
+                $fileContents = file_get_contents($this->image, false, null, $offset, $fileHeader['data_size']);
+
+                $file->hash = hash('sha256', $fileContents);
+                $file->save();
+
+                if (!Storage::exists($investigation->id)) {
+                    Storage::makeDirectory($investigation->id);
+                }
+
+                Storage::put($investigation->id . '/' . $file->name, $fileContents);
             }
         }
     }
