@@ -20,4 +20,9 @@ Route::get('/', function () {
     $carver = new FitCarver('usb001.dd');
     // $carver = new FitCarver('garmin001.dd');
     $carver->carve();
+
+    // dashboard
+    // cases
+    // files
+    // data
 });

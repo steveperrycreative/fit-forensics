@@ -12,7 +12,7 @@ class FitCarver extends Model
     const DATATYPE = '.FIT';
 
 
-    public function __construct($image)
+    public function __construct(string $image)
     {
         $this->image = $image;
     }
@@ -20,100 +20,65 @@ class FitCarver extends Model
 
     public function carve()
     {
-        $headerData = $this->getHeaderData();
+        $data = $this->getHeaderData();
 
-        $i = 0;
+        if (!empty($data)) {
+            $i = 0;
 
-        foreach ($headerData as $header) {
-            $i++;
-            $file = file_get_contents($this->image, false, null, $header['physical_offset'], $header['file_size']);
-            file_put_contents('/Users/Steve/Desktop/fit-examples/usb/example-fit-' . $i . '.fit', $file);
+            foreach ($data as $offset => $fileHeader) {
+                $i++;
+                $file = file_get_contents($this->image, false, null, $offset, $fileHeader['data_size']);
+                // extract to its own method to follow single responsibility
+                file_put_contents('/Users/Steve/Desktop/fit-examples/usb/example-fit-' . $i . '.fit', $file);
+            }
         }
     }
 
 
-    private function swapEndianness($hex)
+    private function getHeaderData(): array
     {
-        return implode('', array_reverse(str_split($hex, 2)));
-    }
-
-
-    private function hex2str($hex)
-    {
-        $string = '';
-
-        for ($i = 0; $i < strlen($hex); $i += 2) {
-            $string .= chr(hexdec(substr($hex, $i, 2)));
-        }
-
-        return $string;
-    }
-
-
-    private function getHeaderData()
-    {
-        $headerData = [];
+        $data = [];
         $offsets = $this->getHeaderOffsets();
 
         foreach ($offsets as $offset) {
-            // file_get_contents length is in bytes
-            // assume 14 bytes for now
-            $hex = bin2hex(file_get_contents($this->image, false, null, $offset, 14));
-            $dataType = $this->hex2str(substr($hex, 16, 8));
+
+            $binary = file_get_contents($this->image, false, null, $offset, 14); // saving a disk read by assuming it's 14-bytes
+
+            $headerSize = unpack('C1', $binary);
+
+            $headerFields = 'C1header_size/' .
+                'C1protocol_version/' .
+                'v1profile_version/' .
+                'V1data_size/' .
+                'C4data_type';
+
+            if ($headerSize > 12) {
+                $headerFields .= '/v1crc';
+            }
+
+            $fileHeader = unpack($headerFields, $binary);
+            $dataType = sprintf('%c%c%c%c', $fileHeader['data_type1'], $fileHeader['data_type2'], $fileHeader['data_type3'], $fileHeader['data_type4']);
 
             if ($dataType === self::DATATYPE) {
-                $data = [
-                    'physical_offset' => $offset,
-                    'header_size' => hexdec(substr($hex, 0, 2)), // 12 or 14
-                    'protocol_version' => hexdec(substr($hex, 2, 2)),
-                    'profile_version' => hexdec($this->swapEndianness(substr($hex, 4, 4))),
-                    'data_size' => hexdec($this->swapEndianness(substr($hex, 8, 8))), // in bytes
-                    'data_type' => $this->hex2str(substr($hex, 16, 8)), // .FIT
-                ];
-
-                $data['file_size'] = $data['header_size'] + $data['data_size'] + 2;
-
-                if ($data['header_size'] > 12) {
-                    $data['crc'] = hexdec($this->swapEndianness(substr($hex, 24, 4))); // optional CRC of bytes 0 through 11, or 0x0000
-                }
-
-                $headerData[] = $data;
-
-                // from PHP Fit File Analysis
-                // $bin = file_get_contents($this->image, false, null, $offset, 14);
-
-                // $header_fields = 'C1header_size/' .
-                //     'C1protocol_version/' .
-                //     'v1profile_version/' .
-                //     'V1data_size/' .
-                //     'C4data_type';
-                // if ($data['header_size'] > 12) {
-                //     $header_fields .= '/v1crc';
-                // }
-                // $file_header = unpack($header_fields, $bin);
-                // $data_type = sprintf('%c%c%c%c', $this->file_header['data_type1'], $this->file_header['data_type2'], $this->file_header['data_type3'], $this->file_header['data_type4']);
-                // echo 'Unpack';
-                // var_dump($file_header);
-                // echo $data_type;
-                //
+                $data[$offset] = $fileHeader;
             }
         }
 
-        return $headerData;
+        return $data;
     }
 
 
-    private function getHeaderOffsets()
+    private function getHeaderOffsets(): array
     {
         set_time_limit(0);
 
+        $offsets = [];
         $filename = $this->image;
         $handle = fopen($filename, 'rb');
 
         if ($handle) {
 
             $chunk = 0;
-            $offsets = [];
             $bufferPointer = 0;
             $chunkSize = 104857600; // 100mb
 
@@ -135,7 +100,7 @@ class FitCarver extends Model
     }
 
 
-    private function findHeader($dataTypeLocation)
+    private function findHeader($dataTypeLocation): int
     {
         return ($dataTypeLocation / 2) - 8; // chars to bytes, count back 8 bytes
     }
