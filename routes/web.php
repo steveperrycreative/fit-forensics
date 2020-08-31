@@ -1,9 +1,7 @@
 <?php
 
-use App\FitCarver;
-use App\Investigation;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,20 +19,24 @@ Route::get('/', function () {
     // $carver = new FitCarver('garmin001.dd');
     // $carver->carve();
 
-    $investigation = Investigation::find(1);
-    $file = $investigation->files()->find(22);
-    $filename = $file->name;
+    // $investigation = Investigation::find(1);
+    // $file = $investigation->files()->find(22);
+    // $filename = $file->name;
 
-    $path = storage_path('app/' . $investigation->id . '/' . $filename);
-    $pFFA = new adriangibbons\phpFITFileAnalysis($path);
+    // $path = storage_path('app/' . $investigation->id . '/' . $filename);
+    // $pFFA = new adriangibbons\phpFITFileAnalysis($path);
 
-    echo 'Output from file: ' . $filename . '<br>';
-    echo 'Original content hash: ' . $file->hash . '<br>';
-    echo 'File hash: ' . hash('sha256', Storage::get($investigation->id . '/' . $filename)) . '<br>';
+    // echo 'Output from file: ' . $filename . '<br>';
+    // echo 'Original content hash: ' . $file->hash . '<br>';
+    // echo 'File hash: ' . hash('sha256', Storage::get($investigation->id . '/' . $filename)) . '<br>';
 
-    var_dump($pFFA->data_mesgs);
+    // var_dump($pFFA->data_mesgs);
 
     // dashboard
     // cases
     // files
 });
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');

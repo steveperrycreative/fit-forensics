@@ -1,4 +1,6 @@
 const mix = require('laravel-mix');
+const domain = 'fit-forensics.test';
+const homedir = require('os').homedir();
 
 /*
  |--------------------------------------------------------------------------
@@ -11,5 +13,18 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/js/app.js', 'public/js')
-    .sass('resources/sass/app.scss', 'public/css');
+mix.postCss('resources/css/app.css', 'public/css', [
+    require('tailwindcss'),
+    require('autoprefixer'),
+])
+    .browserSync({
+        files: ['resources/views/**/*.php'],
+        proxy: 'https://' + domain,
+        host: domain,
+        open: 'external',
+        notify: false,
+        https: {
+            key: homedir + '/.config/valet/Certificates/' + domain + '.key',
+            cert: homedir + '/.config/valet/Certificates/' + domain + '.crt',
+        },
+    });
