@@ -16,6 +16,7 @@ class CreateInvestigationsTable extends Migration
         Schema::create('investigations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
+            $table->string('title');
             $table->longText('notes')->nullable();
             $table->timestamps();
         });

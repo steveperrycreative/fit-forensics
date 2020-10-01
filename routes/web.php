@@ -1,5 +1,6 @@
 <?php
 
+use App\FitCarver;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -14,10 +15,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+Route::get('/carve', function () {
     // $carver = new FitCarver('usb001.dd');
+    $carver = new FitCarver('experiment-one-usb.dd');
     // $carver = new FitCarver('garmin001.dd');
-    // $carver->carve();
+    $carver->carve();
 
     // $investigation = Investigation::find(1);
     // $file = $investigation->files()->find(22);
@@ -39,4 +41,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/', 'InvestigationController@index');
+Route::get('/investigation/{investigation}', 'InvestigationController@show');
+
+Route::get('/file/{file}', 'FileController@show');

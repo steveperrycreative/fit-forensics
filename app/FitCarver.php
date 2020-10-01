@@ -14,6 +14,33 @@ class FitCarver extends Model
     const DATATYPE = '.FIT';
 
 
+    /**
+     * From Fit File Types
+     * type_id lookup table
+     *
+     * @var string[]
+     */
+    protected $type = [
+        1 => 'Device',
+        2 => 'Settings',
+        3 => 'Sport Settings',
+        4 => 'Activity',
+        5 => 'Workout',
+        6 => 'Course',
+        7 => 'Schedule',
+        9 => 'Weight',
+        10 => 'Totals',
+        11 => 'Goals',
+        14 => 'Blood Pressure',
+        15 => 'MonitoringA',
+        20 => 'Activity Summary',
+        28 => 'Daily Monitoring',
+        32 => 'MonitoringB',
+        34 => 'Segment',
+        35 => 'Segment List',
+    ];
+
+
     public function __construct(string $image)
     {
         $this->image = $image;
@@ -39,7 +66,7 @@ class FitCarver extends Model
                 $file->name = $file->id . '.fit';
                 $file->save();
 
-                $fileContents = file_get_contents($this->image, false, null, $offset, $fileHeader['data_size']);
+                $fileContents = file_get_contents($this->image, false, null, $offset, $this->calculateFileSize($fileHeader));
 
                 $file->hash = hash('sha256', $fileContents);
                 $file->save();
@@ -51,6 +78,12 @@ class FitCarver extends Model
                 Storage::put($investigation->id . '/' . $file->name, $fileContents);
             }
         }
+    }
+
+
+    private function calculateFileSize($fileHeader)
+    {
+        return $fileHeader['header_size'] + $fileHeader['data_size'] + 2;
     }
 
 
@@ -113,9 +146,9 @@ class FitCarver extends Model
             }
 
             fclose($handle);
-
-            return $offsets;
         }
+
+        return $offsets;
     }
 
 

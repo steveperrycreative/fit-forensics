@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Providers\PhpFitFileAnalysis;
 use Illuminate\Database\Eloquent\Model;
 
 class File extends Model
@@ -12,6 +13,18 @@ class File extends Model
      * @var array
      */
     protected $guarded = [];
+
+    public function getType($fitData)
+    {
+        $tmp = $fitData->enumData('file', $fitData->data_mesgs['file_id']['type']);
+
+        return is_array($tmp) ? $tmp[0] : $tmp;
+    }
+
+    public function analyse($path)
+    {
+        return new PhpFitFileAnalysis($path);
+    }
 
     public function investigation()
     {

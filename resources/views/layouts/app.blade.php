@@ -15,6 +15,7 @@
     <!-- Fonts -->
     {{-- <link rel="dns-prefetch" href="//fonts.gstatic.com"> --}}
     {{-- <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet"> --}}
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -139,7 +140,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="flex flex-col flex-1 w-0 overflow-hidden">
         <main class="relative z-0 flex-1 overflow-y-auto focus:outline-none" tabindex="0">
             <div class="pt-2 pb-6 md:py-6">

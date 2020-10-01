@@ -14,7 +14,9 @@ class InvestigationController extends Controller
      */
     public function index()
     {
-        //
+        $investigations = Investigation::all();
+
+        return view('investigation.index', ['investigations' => $investigations]);
     }
 
     /**
@@ -46,7 +48,7 @@ class InvestigationController extends Controller
      */
     public function show(Investigation $investigation)
     {
-        //
+        return view('investigation.show', ['investigation' => $investigation]);
     }
 
     /**

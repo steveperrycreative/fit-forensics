@@ -17,6 +17,7 @@ class CreateFilesTable extends Migration
             $table->id();
             $table->foreignId('investigation_id');
             $table->string('name')->nullable();
+            $table->string('type')->nullable();
             $table->string('hash')->nullable();
             $table->bigInteger('original_offset');
             $table->json('header_data');

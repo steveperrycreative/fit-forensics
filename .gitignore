@@ -7,10 +7,10 @@
 .env.backup
 .phpunit.result.cache
 .vscode
+.idea
 Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
 
-/public/usb001.dd
-/public/garmin001.dd
+/public/*.dd

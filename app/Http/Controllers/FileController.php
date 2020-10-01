@@ -46,7 +46,19 @@ class FileController extends Controller
      */
     public function show(File $file)
     {
-        //
+        // This should probably be extracted to its own method
+        // as it's not really the responsibility of show
+        $path = storage_path('app/' . $file->investigation->id . '/' . $file->name);
+        $fitData = $file->analyse($path);
+        if (is_null($file->type)) {
+            $file->type = $file->getType($fitData);
+            $file->save();
+        }
+
+        // Determine what type of FIT file we are looking at
+        // some index aren't available in Settings and Totals.
+
+        return view('file.show', ['file' => $file, 'data' => $fitData]);
     }
 
     /**
