@@ -22,6 +22,7 @@ class CreateFilesTable extends Migration
             $table->bigInteger('original_offset');
             $table->json('header_data');
             $table->json('data')->nullable();
+            $table->boolean('parsed')->default(false);
             $table->timestamps();
         });
     }

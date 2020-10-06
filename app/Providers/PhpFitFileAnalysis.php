@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Database\Eloquent\Model;
+
 /**
  * phpFITFileAnalysis
  * =====================
@@ -36,7 +38,7 @@ if (!defined('FIT_UNIX_TS_DIFF')) {
     define('FIT_UNIX_TS_DIFF', 631065600);
 }
 
-class PhpFitFileAnalysis
+class PhpFitFileAnalysis extends Model
 {
     public $data_mesgs = [];  // Used to store the data read from the file in associative arrays.
     private $dev_field_descriptions = [];

@@ -34,7 +34,7 @@
                         </a>
                     </div>
                     <nav class="flex-1 px-2 mt-5 space-y-1 bg-blue-800">
-                        <a href="#"
+                        <a href="/"
                             class="flex items-center px-2 py-2 text-sm font-medium leading-5 text-white transition duration-150 ease-in-out bg-blue-900 rounded-md group focus:outline-none focus:bg-blue-700">
                             <svg class="w-6 h-6 mr-3 text-blue-400 transition duration-150 ease-in-out group-focus:text-blue-300"
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -54,14 +54,14 @@
                             Team
                         </a>
 
-                        <a href="#"
+                        <a href="/"
                             class="flex items-center px-2 py-2 text-sm font-medium leading-5 text-blue-300 transition duration-150 ease-in-out rounded-md group hover:text-white hover:bg-blue-700 focus:outline-none focus:text-white focus:bg-blue-700">
                             <svg class="w-6 h-6 mr-3 text-blue-400 transition duration-150 ease-in-out group-hover:text-blue-300 group-focus:text-blue-300"
                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                             </svg>
-                            Projects
+                            Investigations
                         </a>
 
                         <a href="#"
@@ -143,7 +143,7 @@
 
     <div class="flex flex-col flex-1 w-0 overflow-hidden">
         <main class="relative z-0 flex-1 overflow-y-auto focus:outline-none" tabindex="0">
-            <div class="pt-2 pb-6 md:py-6">
+            <div class="pt-2 pb-6 md:pt-6 md:pb-20">
                 @yield('content')
             </div>
         </main>

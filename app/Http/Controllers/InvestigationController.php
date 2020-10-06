@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\File;
+use App\FitAnalyser;
 use App\Investigation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class InvestigationController extends Controller
 {
@@ -83,5 +87,45 @@ class InvestigationController extends Controller
     public function destroy(Investigation $investigation)
     {
         //
+    }
+
+
+    public function parse(Request $request, Investigation $investigation, File $file = null)
+    {
+        if ($file) {
+            $files = [$file];
+        } else {
+            $files = $investigation->files->where('parsed', '=', false);
+        }
+
+        $success = 0;
+        $errors = 0;
+
+        foreach ($files as $file) {
+
+            try {
+                $path = storage_path('app/' . $file->investigation->id . '/' . $file->name);
+                $fitData = new FitAnalyser($path);
+                $file->type = $fitData->getType();
+                $file->parsed = true;
+                $file->save();
+                $success++;
+            } catch (Throwable $e) {
+                $errors++;
+                report($e);
+
+                continue;
+            }
+        }
+
+        if ($success > 0) {
+            $request->session()->flash('status', $success . ' files parsed!');
+        }
+
+        if ($errors > 0) {
+            $request->session()->flash('error', 'There were '  . $errors . ' errors!');
+        }
+
+        return redirect()->back();
     }
 }

@@ -4,13 +4,24 @@
 
 <div class="px-4 mx-auto max-w-7xl sm:px-6 md:px-8 space-y-8">
 
-    <header>
-        <h1 class="text-2xl font-semibold text-gray-900">{{ $investigation->title }}</h1>
+    <header class="space-y-4">
+        <div class="flex items-center justify-between">
+            <h1 class="text-2xl font-semibold text-gray-900">{{ $investigation->title }}</h1>
+            <a href="/investigation/{{ $investigation->id }}/parse" class="bg-blue-800 text-blue-100 text-sm rounded px-4 py-2">Parse all files</a>
+        </div>
+
         @if (session('status'))
-            <div>
+            <div class="bg-teal-300 border border-teal-800 text-teal-800 px-4 py-2 rounded text-center">
                 {{ session('status') }}
             </div>
         @endif
+
+        @if (session('error'))
+            <div class="bg-red-300 border border-red-800 text-red-800 px-4 py-2 rounded text-center">
+                {{ session('error') }}
+            </div>
+        @endif
+
     </header>
 
     <section class="flex flex-col">
@@ -56,7 +67,7 @@
                                     {{ $file->id }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
-                                    {{ $file->type }}
+                                    {{ ucfirst($file->type) }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-500">
                                     {{ $file->hash }}

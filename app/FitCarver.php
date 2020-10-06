@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\File;
 use App\Investigation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 class FitCarver extends Model
 {
     public $image;
+    public $offset;
 
     const FITHEX = '2e464954';
     const DATATYPE = '.FIT';
@@ -41,9 +43,10 @@ class FitCarver extends Model
     ];
 
 
-    public function __construct(string $image)
+    public function __construct(string $image, int $offset = 0)
     {
         $this->image = $image;
+        $this->offset = $offset;
     }
 
 
@@ -51,31 +54,34 @@ class FitCarver extends Model
     {
         $data = $this->getHeaderData();
 
-        if (!empty($data)) {
+        if (empty($data)) {
+            return;
+        }
 
-            foreach ($data as $offset => $fileHeader) {
+        foreach ($data as $offset => $fileHeader) {
 
+            if ($this->calculateFileSize($fileHeader) < 104857600) { // If file is less than 100mb
                 $investigation = Investigation::find(1);
 
-                $file = $investigation->files()->create([
-                    'hash' => null,
-                    'original_offset' => $offset,
-                    'header_data' => json_encode($fileHeader),
-                ]);
-
-                $file->name = $file->id . '.fit';
-                $file->save();
-
                 $fileContents = file_get_contents($this->image, false, null, $offset, $this->calculateFileSize($fileHeader));
+                $hash = hash('sha256', $fileContents);
 
-                $file->hash = hash('sha256', $fileContents);
-                $file->save();
+                if ( ! $investigation->files->where('hash', '=', $hash)->first()) { // Check we haven't already carved the file
+                    $file = $investigation->files()->create([
+                        'hash' => $hash,
+                        'original_offset' => $offset,
+                        'header_data' => json_encode($fileHeader),
+                    ]);
 
-                if (!Storage::exists($investigation->id)) {
-                    Storage::makeDirectory($investigation->id);
+                    $file->name = 'inv-' . $investigation->id . '-file-' . $file->id . '.fit';
+                    $file->save();
+
+                    if ( ! Storage::exists($investigation->id)) {
+                        Storage::makeDirectory($investigation->id);
+                    }
+
+                    Storage::put($investigation->id . '/' . $file->name, $fileContents);
                 }
-
-                Storage::put($investigation->id . '/' . $file->name, $fileContents);
             }
         }
     }
@@ -98,21 +104,23 @@ class FitCarver extends Model
 
             $headerSize = unpack('C1', $binary);
 
-            $headerFields = 'C1header_size/' .
-                'C1protocol_version/' .
-                'v1profile_version/' .
-                'V1data_size/' .
-                'C4data_type';
+            if ($headerSize > 14) { // Ignore headers over 14-bytes for now
+                $headerFields = 'C1header_size/' .
+                                'C1protocol_version/' .
+                                'v1profile_version/' .
+                                'V1data_size/' .
+                                'C4data_type';
 
-            if ($headerSize > 12) {
-                $headerFields .= '/v1crc';
-            }
+                if ($headerSize > 12) {
+                    $headerFields .= '/v1crc';
+                }
 
-            $fileHeader = unpack($headerFields, $binary);
-            $dataType = sprintf('%c%c%c%c', $fileHeader['data_type1'], $fileHeader['data_type2'], $fileHeader['data_type3'], $fileHeader['data_type4']);
+                $fileHeader = unpack($headerFields, $binary);
+                $dataType = sprintf('%c%c%c%c', $fileHeader['data_type1'], $fileHeader['data_type2'], $fileHeader['data_type3'], $fileHeader['data_type4']);
 
-            if ($dataType === self::DATATYPE) {
-                $data[$offset] = $fileHeader;
+                if ($dataType === self::DATATYPE) {
+                    $data[$offset] = $fileHeader;
+                }
             }
         }
 
@@ -127,6 +135,10 @@ class FitCarver extends Model
         $offsets = [];
         $filename = $this->image;
         $handle = fopen($filename, 'rb');
+
+        if ($this->offset !== 0) {
+            fseek($handle, $this->offset);
+        }
 
         if ($handle) {
 

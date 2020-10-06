@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\File;
+use App\FitAnalyser;
 use Illuminate\Http\Request;
 
 class FileController extends Controller
@@ -49,16 +50,19 @@ class FileController extends Controller
         // This should probably be extracted to its own method
         // as it's not really the responsibility of show
         $path = storage_path('app/' . $file->investigation->id . '/' . $file->name);
-        $fitData = $file->analyse($path);
-        if (is_null($file->type)) {
-            $file->type = $file->getType($fitData);
+        $fitData = new FitAnalyser($path);
+        if ( ! $file->parsed) {
+            $file->type = $fitData->getType();
+            $file->parsed = true;
             $file->save();
         }
 
-        // Determine what type of FIT file we are looking at
-        // some index aren't available in Settings and Totals.
+//        var_dump($fitData->data_mesgs);
 
-        return view('file.show', ['file' => $file, 'data' => $fitData]);
+        $currentHash = hash('sha256', file_get_contents($path));
+//        $json = json_encode($fitData->data_mesgs);
+
+        return view('file.show', ['file' => $file, 'data' => $fitData, 'currentHash' => $currentHash]);
     }
 
     /**
