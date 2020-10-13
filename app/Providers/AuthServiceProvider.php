@@ -2,8 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\File;
+use App\Models\Investigation;
+use App\Models\Team;
+use App\Policies\FilePolicy;
+use App\Policies\InvestigationPolicy;
+use App\Policies\TeamPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -13,7 +18,9 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        // 'App\Model' => 'App\Policies\ModelPolicy',
+        Team::class => TeamPolicy::class,
+        File::class => FilePolicy::class,
+        Investigation::class => InvestigationPolicy::class,
     ];
 
     /**

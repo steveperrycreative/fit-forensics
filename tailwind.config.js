@@ -1,20 +1,27 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
-  future: {
-    removeDeprecatedGapUtilities: true,
-    purgeLayersByDefault: true,
-  },
-  purge: [],
-  theme: {
-    extend: {
-        fontFamily: {
-            sans: ['"IBM Plex Sans"', ...defaultTheme.fontFamily.sans],
+    future: {
+        removeDeprecatedGapUtilities: true,
+        purgeLayersByDefault: true,
+    },
+    purge: [
+        './vendor/laravel/jetstream/**/*.blade.php',
+        './storage/framework/views/*.php',
+        './resources/views/**/*.blade.php',
+    ],
+
+    theme: {
+        extend: {
+            fontFamily: {
+                sans: ['"IBM Plex Sans"', ...defaultTheme.fontFamily.sans],
+            },
         },
     },
-  },
-  variants: {},
-  plugins: [
-      require('@tailwindcss/ui'),
-  ],
-}
+
+    variants: {
+        opacity: ['responsive', 'hover', 'focus', 'disabled'],
+    },
+
+    plugins: [require('@tailwindcss/ui')],
+};

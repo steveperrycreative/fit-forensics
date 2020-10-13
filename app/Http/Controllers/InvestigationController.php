@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\File;
-use App\FitAnalyser;
-use App\Investigation;
+use App\Models\Carve;
+use App\Models\File;
+use App\Models\FitAnalyser;
+use App\Models\Investigation;
+use App\Models\Team;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rules\In;
 use Throwable;
 
 class InvestigationController extends Controller
@@ -18,19 +22,22 @@ class InvestigationController extends Controller
      */
     public function index()
     {
-        $investigations = Investigation::all();
+        $investigations = Auth::user()->currentTeam->investigations->all();
 
-        return view('investigation.index', ['investigations' => $investigations]);
+        return view('investigations.index', ['investigations' => $investigations]);
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\View\View
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $this->authorize('create', Investigation::class);
+
+        return view('investigations.create', ['user' => $request->user()]);
     }
 
     /**
@@ -52,7 +59,9 @@ class InvestigationController extends Controller
      */
     public function show(Investigation $investigation)
     {
-        return view('investigation.show', ['investigation' => $investigation]);
+        $this->authorize('access', $investigation);
+
+        return view('investigations.show', ['investigation' => $investigation]);
     }
 
     /**
@@ -90,41 +99,33 @@ class InvestigationController extends Controller
     }
 
 
-    public function parse(Request $request, Investigation $investigation, File $file = null)
+    public function search(Request $request, Investigation $investigation)
     {
-        if ($file) {
-            $files = [$file];
-        } else {
-            $files = $investigation->files->where('parsed', '=', false);
-        }
+        $this->authorize('access', $investigation);
 
-        $success = 0;
-        $errors = 0;
+        $imageName = $investigation->image;
 
-        foreach ($files as $file) {
+        Carve::searchForFiles($request, $imageName, $investigation);
 
-            try {
-                $path = storage_path('app/' . $file->investigation->id . '/' . $file->name);
-                $fitData = new FitAnalyser($path);
-                $file->type = $fitData->getType();
-                $file->parsed = true;
-                $file->save();
-                $success++;
-            } catch (Throwable $e) {
-                $errors++;
-                report($e);
+        return redirect()->back();
+    }
 
-                continue;
-            }
-        }
 
-        if ($success > 0) {
-            $request->session()->flash('status', $success . ' files parsed!');
-        }
+    public function carve(Request $request, Investigation $investigation)
+    {
+        $this->authorize('access', $investigation);
 
-        if ($errors > 0) {
-            $request->session()->flash('error', 'There were '  . $errors . ' errors!');
-        }
+        Carve::extractFiles($request, $investigation);
+
+        return redirect()->back();
+    }
+
+
+    public function parse(Request $request, Investigation $investigation)
+    {
+        $this->authorize('access', $investigation);
+
+        Carve::parseFiles($request, $investigation);
 
         return redirect()->back();
     }

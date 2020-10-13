@@ -1,7 +1,7 @@
 <?php
 
-use App\FitCarver;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\FileController;
+use App\Http\Controllers\InvestigationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,18 +15,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/carve', function () {
-    $carver = new FitCarver('experiment-one-usb.dd');
-//    $carver = new FitCarver('experiment-two-usb.dd');
-//    $carver = new FitCarver('experiment-three-garmin.dd');
-    $carver->carve();
+Route::get('/', function () {
+    return view('welcome');
 });
 
-Auth::routes();
+Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
 
-Route::get('/', 'InvestigationController@index');
+Route::middleware(['auth:sanctum', 'verified'])->get('/investigations', [InvestigationController::class, 'index']);
+Route::middleware(['auth:sanctum', 'verified'])->get('/investigations/create', [InvestigationController::class, 'create']);
+Route::middleware(['auth:sanctum', 'verified'])->get('/investigations/{investigation}', [InvestigationController::class, 'show']);
+Route::middleware(['auth:sanctum', 'verified'])->get('/investigations/{investigation}/search', [InvestigationController::class, 'search']);
+Route::middleware(['auth:sanctum', 'verified'])->get('/investigations/{investigation}/carve', [InvestigationController::class, 'carve']);
+Route::middleware(['auth:sanctum', 'verified'])->get('/investigations/{investigation}/parse/{file?}', [InvestigationController::class, 'parse']);
 
-Route::get('/investigation/{investigation}', 'InvestigationController@show');
-Route::get('/investigation/{investigation}/parse/{file?}', 'InvestigationController@parse');
-
-Route::get('/file/{file}', 'FileController@show');
+Route::middleware(['auth:sanctum', 'verified'])->get('/files/{file}', [FileController::class, 'show']);
