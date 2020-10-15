@@ -11,11 +11,13 @@ class CreateInvestigationForm extends Component
     public $title;
     public $notes;
     public $image;
+    public $image_hash;
     public $investigation;
 
     protected $rules = [
         'title' => 'required|min:6',
         'image' => 'required',
+        'image_hash' => 'required',
     ];
 
     public function updated($propertyName)
@@ -31,12 +33,14 @@ class CreateInvestigationForm extends Component
             'title' => $this->title,
             'notes' => $this->notes,
             'image' => $this->image,
+            'image_hash' => $this->image_hash,
             'team_id' => $this->getTeamProperty()->id,
         ]);
 
         $this->title = '';
         $this->notes = '';
         $this->image = '';
+        $this->image_hash = '';
 
         session()->flash('success_message', 'Investigation successfully created.');
     }

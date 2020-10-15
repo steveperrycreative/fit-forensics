@@ -42,6 +42,12 @@
             </p>
         </div>
 
+        <div class="col-span-6 sm:col-span-4">
+            <x-jet-label for="image_hash" value="{{ __('Image Hash') }}" />
+            <x-jet-input id="image_hash" type="text" class="mt-1 block w-full" wire:model="image_hash" />
+            <x-jet-input-error for="image_hash" class="mt-2" />
+        </div>
+
         @if(session('success_message'))
             <div class="col-span-6 sm:col-span-4">
                 <div class="rounded-md bg-green-50 p-4">

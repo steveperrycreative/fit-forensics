@@ -19,6 +19,7 @@ class CreateInvestigationsTable extends Migration
             $table->string('title');
             $table->longText('notes')->nullable();
             $table->string('image');
+            $table->longText('image_hash');
             $table->timestamps();
         });
     }
