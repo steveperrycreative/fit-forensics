@@ -107,27 +107,39 @@ class Carve extends Model
 
         $offsets = [];
         $filename = 'disk_images/' . $imageName;
-        $handle = fopen($filename, 'rb');
 
-        if ($handle) {
+        for ($i = 0; $i < 2; $i++) {
+            $handle = fopen($filename, 'rb');
 
-            $chunk = 0;
-            $bufferPointer = 0;
-            $chunkSize = 104857600; // 100mb
+            if ($handle) {
 
-            while ( ! feof($handle)) {
-                $buffer = bin2hex(fread($handle, $chunkSize));
+                $chunk = 0;
+                $previousChunks = 0;
+                $bufferPointer = 0;
+//                $chunkSize = ($i === 0) ? 104857600 : 99614720; // 100mb : 95mb
+                $chunkSize = ($i === 0) ? 104857600 : 104857596; // 100mb : -4 bytes
 
-                while (($bufferPointer = strpos($buffer, self::FITHEX, $bufferPointer)) !== false) {
-                    $offsets[] = self::findHeader($bufferPointer) + ($chunk * $chunkSize);
-                    $bufferPointer = $bufferPointer + strlen(self::FITHEX);
+                while ( ! feof($handle)) {
+                    $buffer = bin2hex(fread($handle, $chunkSize));
+
+                    while (($bufferPointer = strpos($buffer, self::FITHEX, $bufferPointer)) !== false) {
+                        $offsets[] = self::findHeader($bufferPointer) + $previousChunks;
+                        $bufferPointer = $bufferPointer + strlen(self::FITHEX);
+                    }
+
+                    $chunk++;
+                    $previousChunks = $previousChunks + $chunkSize;
+
+                    if ($i === 1 && $chunk === 1) {
+                        $chunkSize = 104857600; // Reset the chunk back to 100mb
+                    }
                 }
 
-                $chunk++;
+                fclose($handle);
             }
-
-            fclose($handle);
         }
+
+        $offsets = array_unique($offsets);
 
         return $offsets;
     }

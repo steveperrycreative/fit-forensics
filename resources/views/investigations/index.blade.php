@@ -41,7 +41,6 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <!-- Odd row -->
                         @foreach($investigations as $investigation)
                             @if($loop->iteration % 2 == 0)
                                 <tr class="bg-white">

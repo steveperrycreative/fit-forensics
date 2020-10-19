@@ -128,7 +128,7 @@
                                     </span>
                                 </div>
                                 <div class="ml-4 flex-shrink-0">
-                                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 transition duration-150 ease-in-out">
+                                    <a href="/files/{{ $file->id }}/download" class="font-medium text-indigo-600 hover:text-indigo-500 transition duration-150 ease-in-out">
                                         Download FIT File
                                     </a>
                                 </div>
@@ -182,7 +182,7 @@
                             Activity Start
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                            {{ \Carbon\Carbon::parse($data->getEventTimestamp())->format('d M Y h:m:s') }}
+                            {{ \Carbon\Carbon::parse($data->getEventTimestamp())->format('d M Y g:ia') }}
                         </dd>
                     </div>
 
@@ -191,7 +191,7 @@
                             Total Distance
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                            {{ $data->getTotalDistance() }}
+                            {{ $data->getTotalDistance() }} km
                         </dd>
                     </div>
 
@@ -200,7 +200,7 @@
                             Total Elapsed Time
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                            {{ $data->getTotalElapsedTime() }}
+                            {{ gmdate('H:i:s', $data->getTotalElapsedTime()) }}
                         </dd>
                     </div>
 
@@ -209,7 +209,7 @@
                             Maximum Heart Rate
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                            {{ $data->getMaxHr() }}
+                            {{ $data->getMaxHr() }} bpm
                         </dd>
                     </div>
 
@@ -218,7 +218,7 @@
                             Maximum Speed
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                            {{ $data->getMaxSpeed() }}
+                            {{ $data->getMaxSpeed() }} kph
                         </dd>
                     </div>
 
@@ -284,7 +284,7 @@
                             Weight
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                            {{ $data->getWeight() }}
+                            {{ $data->getWeight() }} kg
                         </dd>
                     </div>
 
@@ -311,7 +311,7 @@
                             Height
                         </dt>
                         <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
-                            {{ $data->getHeight() }}
+                            {{ $data->getHeight() }} m
                         </dd>
                     </div>
 

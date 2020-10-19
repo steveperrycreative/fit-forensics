@@ -6,6 +6,7 @@ use App\Models\File;
 use App\Models\FitAnalyser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
@@ -49,20 +50,18 @@ class FileController extends Controller
     public function show(File $file)
     {
         if (Auth::user()->can('access', $file)) {
-            // This should probably be extracted to its own method
-            // as it's not really the responsibility of show
-            $path = storage_path('app/' . $file->investigation->id . '/' . $file->name);
+
+            $path = storage_path('app/' . $file->path());
             $fitData = new FitAnalyser($path);
+            $currentHash = hash('sha256', file_get_contents($path));
+
             if ( ! $file->parsed) {
                 $file->type = $fitData->getType();
                 $file->parsed = true;
                 $file->save();
             }
 
-//        var_dump($path);
-
-            $currentHash = hash('sha256', file_get_contents($path));
-//        $json = json_encode($fitData->data_mesgs);
+            //$json = json_encode($fitData->data_mesgs);
 
             return view('files.show', ['file' => $file, 'data' => $fitData, 'currentHash' => $currentHash]);
         }
@@ -100,5 +99,10 @@ class FileController extends Controller
     public function destroy(File $file)
     {
         //
+    }
+
+    public function download(File $file)
+    {
+        return Storage::download($file->path());
     }
 }

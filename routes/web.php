@@ -31,3 +31,4 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/investigations/{investiga
 Route::middleware(['auth:sanctum', 'verified'])->get('/investigations/{investigation}/parse/{file?}', [InvestigationController::class, 'parse']);
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/files/{file}', [FileController::class, 'show']);
+Route::middleware(['auth:sanctum', 'verified'])->get('/files/{file}/download', [FileController::class, 'download']);

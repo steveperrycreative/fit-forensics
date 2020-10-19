@@ -13,6 +13,11 @@ class File extends Model
      */
     protected $guarded = [];
 
+    public function path()
+    {
+        return $this->investigation->id . '/' . $this->name;
+    }
+
     public function investigation()
     {
         return $this->belongsTo(Investigation::class);

@@ -57,7 +57,6 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <!-- Odd row -->
                         @foreach($investigation->files as $file)
                             @if($loop->iteration % 2 == 0)
                                 <tr class="bg-gray-50">
