@@ -68,7 +68,7 @@ class Carve extends Model
 
             $headerSize = unpack('C1', $binary);
 
-            if ($headerSize > 14) { // Ignore headers over 14-bytes for now
+            if ($headerSize <= 14) { // Ignore headers over 14-bytes for now
                 $headerFields = 'C1header_size/' .
                                 'C1protocol_version/' .
                                 'v1profile_version/' .
