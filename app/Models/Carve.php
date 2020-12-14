@@ -55,7 +55,14 @@ class Carve extends Model
             $request->session()->flash('error', 'There were ' . $errors . ' errors!');
         }
     }
+    
 
+    /**
+     * @param $imageName
+     * @return array
+     *              
+     * @see https://github.com/steveperrycreative/fit-forensics/blob/fea06528e272922de90d00d8162bcf4aede8809c/app/Models/PhpFitFileAnalysis.php#L1317
+     */
     private static function getHeaderData($imageName): array
     {
         $data = [];
