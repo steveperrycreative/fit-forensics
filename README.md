@@ -1,6 +1,6 @@
 # FIT Forensics
 
-A Masters dissertation project by Steve Perry as part of the Advanced Security and Digital Forensics Masters degree course, completed in 2021.
+A Masters dissertation project by Steve Perry as part of the Advanced Security and Digital Forensics Masters degree course at Edinburgh Napier university, completed in 2021 as a distance learner.
 
 ## About FIT Forensics
 
